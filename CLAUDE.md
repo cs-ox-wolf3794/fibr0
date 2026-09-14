@@ -121,7 +121,10 @@ Seeded from constituents of XLE, XOP, OIH, ICLN, TAN, URA, XLU plus a hand-maint
 pipeline/src/fibr0/          Python package. cli.py is the entry point; stages/ holds one module per pipeline stage.
 pipeline/src/fibr0/prompts/  The analysis system prompt. Part of the public methodology.
 pipeline/tests/              pytest. fixtures/events.json is the development fixture for the analyze stage.
-web/                         Next.js 16 (App Router, src/ layout, Tailwind). web/src/lib/disclaimer.ts is the disclaimer source.
+web/                         Next.js 16 (App Router, src/ layout, Tailwind). Routes: / (latest digest), /digests, /digests/[id], /calibration.
+web/src/lib/db.ts            Server-only Postgres client (the `postgres` package) reading DATABASE_URL. next.config.ts loads the repo-root .env locally.
+web/src/lib/queries.ts       Every SQL query the web app makes. Public tables only. Pages are force-dynamic; add caching here, not in pages.
+web/src/lib/disclaimer.ts    The disclaimer source. web/src/lib/brand.ts holds name and tagline.
 supabase/migrations/         Plain SQL, numbered. Applied by hand via the Supabase SQL editor or psql (no Supabase CLI in use).
 supabase/seed/               sources.csv and ticker_universe.csv, loaded with \copy.
 .github/workflows/           pipeline.yml (digest cron), resolve.yml (daily scoring), ci.yml (lint + tests + build).

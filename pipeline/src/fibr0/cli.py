@@ -91,6 +91,48 @@ def cmd_db(args: argparse.Namespace, settings: Settings) -> int:
     return 0
 
 
+def cmd_show(args: argparse.Namespace, settings: Settings) -> int:
+    """Print the most recent digest: one line per prediction, grouped by event."""
+    from fibr0.compliance import DISCLAIMER
+
+    with connect(settings.require_database()) as conn, conn.cursor() as cur:
+        cur.execute("select id, slot, published_at from digests order by id desc limit 1")
+        digest = cur.fetchone()
+        if not digest:
+            print("no digests published yet")
+            return 0
+        cur.execute(
+            """
+            select p.ticker, p.direction, p.horizon, p.magnitude, p.impact_order,
+                   p.calibrated_confidence, p.is_calibrated, p.rationale_summary,
+                   e.title, e.id as event_id
+            from predictions p join events e on e.id = p.event_id
+            where p.digest_id = %s
+            order by e.id, p.calibrated_confidence desc
+            """,
+            (digest["id"],),
+        )
+        rows = cur.fetchall()
+    published = f"{digest['published_at']:%Y-%m-%d %H:%M %Z}"
+    print(f"digest #{digest['id']}  slot={digest['slot']}  published={published}")
+    print(f"{len(rows)} predictions\n")
+    current = None
+    for r in rows:
+        if r["event_id"] != current:
+            current = r["event_id"]
+            print(f"== {r['title'][:100]}")
+            print(f"   {r['rationale_summary']}")
+        arrow = "rise" if r["direction"] == "up" else "fall"
+        tag = "" if r["is_calibrated"] else " (uncalibrated)"
+        p = float(r["calibrated_confidence"])
+        print(
+            f"   {r['ticker']:<5} {arrow:<4} {r['horizon']}  p={p:.2f}{tag}  "
+            f"{r['magnitude']}, {r['impact_order']}-order"
+        )
+    print(f"\n{DISCLAIMER}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fibr0")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -103,6 +145,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     res_p = sub.add_parser("resolve", help="score elapsed predictions")
     res_p.set_defaults(func=cmd_resolve)
+
+    show_p = sub.add_parser("show", help="print the most recent digest")
+    show_p.set_defaults(func=cmd_show)
 
     db_p = sub.add_parser("db", help="apply migrations, load seeds, show row counts")
     db_p.add_argument("action", choices=("migrate", "seed", "status"))
