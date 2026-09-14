@@ -1,0 +1,17 @@
+id,name,tier,trust_weight,kind,url,enabled
+eia_today_in_energy,EIA Today in Energy,1,1.00,rss,https://www.eia.gov/rss/todayinenergy.xml,true
+eia_press,EIA Press Releases,1,1.00,rss,https://www.eia.gov/rss/press_rss.xml,true
+ferc_news,FERC News,1,1.00,rss,https://www.ferc.gov/news-events/news/rss.xml,true
+doe_news,DOE Newsroom,1,1.00,rss,https://www.energy.gov/rss/newsroom,true
+nrc_news,NRC News Releases,1,1.00,rss,https://www.nrc.gov/public-involve/rss?feed=news,true
+bsee_news,BSEE Newsroom,1,1.00,rss,https://www.bsee.gov/newsroom/latest-news/rss.xml,true
+epa_news,EPA News Releases,1,0.95,rss,https://www.epa.gov/newsreleases/search/rss,true
+nhc_atlantic,NOAA NHC Atlantic Advisories,1,1.00,rss,https://www.nhc.noaa.gov/index-at.xml,true
+opec_press,OPEC Press Releases,1,0.95,rss,https://www.opec.org/opec_web/en/press_room/rss.xml,true
+iea_news,IEA News,1,0.95,rss,https://www.iea.org/news.rss,true
+globenewswire_energy,GlobeNewswire Energy,1,0.90,rss,https://www.globenewswire.com/RssFeed/industry/9576-Energy/feedTitle/GlobeNewswire%20-%20Industry%20News%20on%20Energy,true
+businesswire_energy,Business Wire Energy,1,0.90,rss,https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFpRWQ==,true
+sec_edgar_8k,SEC EDGAR 8-K (universe tickers),1,1.00,edgar,https://efts.sec.gov/LATEST/search-index?forms=8-K,true
+reuters_energy,Reuters Energy,2,0.80,rss,https://www.reutersagency.com/feed/?best-topics=energy&post_type=best,true
+ap_business,AP Business,2,0.80,rss,https://rsshub.app/apnews/topics/business,true
+gdelt_events,GDELT Event Stream,3,0.40,page,http://data.gdeltproject.org/gdeltv2/lastupdate.txt,false

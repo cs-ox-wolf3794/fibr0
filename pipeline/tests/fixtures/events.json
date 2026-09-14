@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "slot": "pre_open",
+    "title": "Fire shuts crude unit at large Texas Gulf Coast refinery",
+    "text_for_analysis": "[businesswire_energy | tier 1] Fire shuts crude unit at large Texas Gulf Coast refinery\nThe operator confirmed a fire at its 580,000 barrel-per-day refinery late Sunday. One crude distillation unit is offline with no restart date. No injuries were reported. Gulf Coast gasoline cracks widened in early trading.\nhttps://example.com/refinery-fire",
+    "source_urls": ["https://example.com/refinery-fire"],
+    "source_tiers": [1]
+  },
+  {
+    "id": 2,
+    "slot": "midday",
+    "title": "EIA weekly report shows larger-than-expected US crude draw",
+    "text_for_analysis": "[eia_press | tier 1] EIA weekly report shows larger-than-expected US crude draw\nCommercial crude inventories fell 6.2 million barrels versus a consensus estimate of a 1.5 million barrel draw. Gasoline stocks fell 2.1 million barrels. Refinery utilization rose to 93.4 percent.\nhttps://example.com/eia-wpsr",
+    "source_urls": ["https://example.com/eia-wpsr"],
+    "source_tiers": [1]
+  },
+  {
+    "id": 3,
+    "slot": "post_close",
+    "title": "NHC: tropical storm expected to strengthen into hurricane, track toward central Gulf of Mexico",
+    "text_for_analysis": "[nhc_atlantic | tier 1] Tropical storm expected to strengthen into hurricane, track toward central Gulf of Mexico\nThe National Hurricane Center forecasts the system to reach hurricane strength within 48 hours with a track crossing the central Gulf production area. Operators have begun evacuating non-essential offshore personnel.\nhttps://example.com/nhc-advisory",
+    "source_urls": ["https://example.com/nhc-advisory"],
+    "source_tiers": [1]
+  },
+  {
+    "id": 4,
+    "slot": "pre_open",
+    "title": "FERC approves certificate for major Appalachia-to-Southeast natural gas pipeline expansion",
+    "text_for_analysis": "[ferc_news | tier 1] FERC approves certificate for major Appalachia-to-Southeast natural gas pipeline expansion\nThe Commission issued a certificate of public convenience and necessity for a 1.6 billion cubic feet per day expansion. Construction is expected to begin next quarter with service targeted for late next year.\nhttps://example.com/ferc-certificate",
+    "source_urls": ["https://example.com/ferc-certificate"],
+    "source_tiers": [1]
+  },
+  {
+    "id": 5,
+    "slot": "midday",
+    "title": "Unconfirmed reports of drone strike on Middle East export terminal",
+    "text_for_analysis": "[gdelt_events | tier 3] Unconfirmed reports of drone strike on Middle East export terminal\nAutomated event detection flagged multiple social media posts describing explosions near a crude export terminal. No official confirmation. Brent futures rose 1.8 percent in the hour after the first reports.\nhttps://example.com/gdelt-event",
+    "source_urls": ["https://example.com/gdelt-event"],
+    "source_tiers": [3]
+  }
+]

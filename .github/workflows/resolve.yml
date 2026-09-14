@@ -1,0 +1,32 @@
+name: resolve
+
+# Scores every prediction whose horizon has elapsed against daily closes and
+# updates the calibration table. Runs once per day after US close prices settle.
+on:
+  schedule:
+    - cron: "30 23 * * 1-5"   # 19:30 EDT / 18:30 EST, weekdays
+  workflow_dispatch:
+
+concurrency:
+  group: resolve
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+      - run: pip install -e .
+      - name: Resolve predictions
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: fibr0 resolve

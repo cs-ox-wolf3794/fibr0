@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fibr0-pipeline"
+version = "0.1.0"
+description = "fibr0 news-to-stock-impact pipeline"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=1.0",
+    "pydantic>=2.7",
+    "psycopg[binary]>=3.2",
+    "feedparser>=6.0",
+    "requests>=2.32",
+    "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+fibr0 = "fibr0.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fibr0 = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
