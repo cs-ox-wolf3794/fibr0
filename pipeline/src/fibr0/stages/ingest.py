@@ -14,7 +14,8 @@ from fibr0.models import RawItem
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = "fibr0-pipeline/0.1 (+https://fibr0.com; open-source methodology)"
+# SEC EDGAR requires a descriptive User-Agent with a contact address and rejects generic ones.
+USER_AGENT = "fibr0-pipeline/0.1 (https://fibr0.com; contact@fibr0.com)"
 
 
 def url_hash(url: str) -> str:

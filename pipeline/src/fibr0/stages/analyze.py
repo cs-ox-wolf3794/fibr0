@@ -28,6 +28,17 @@ log = logging.getLogger(__name__)
 MAX_TOKENS = 16000
 POLL_SECONDS = 60
 
+# USD per million tokens (input, output) at standard rates. Batch is half of these.
+PRICES = {"claude-opus-5": (5.0, 25.0), "claude-sonnet-5": (2.0, 10.0)}
+
+
+def estimate_cost_usd(
+    model: str, input_tokens: int, output_tokens: int, batch: bool = False
+) -> float:
+    inp, out = PRICES.get(model, (5.0, 25.0))
+    cost = (input_tokens * inp + output_tokens * out) / 1_000_000
+    return cost / 2 if batch else cost
+
 
 def system_prompt() -> str:
     return resources.files("fibr0.prompts").joinpath("analyze_system.md").read_text("utf-8")
@@ -113,6 +124,15 @@ def analyze_one(
         raise RuntimeError(f"model refused event {event.id}: {response.stop_details}")
     result = _clamp(response.parsed_output)
     raw_text = next((b.text for b in response.content if b.type == "text"), "")
+    u = response.usage
+    log.info(
+        "event=%s usage in=%d out=%d cache_read=%d est_usd=%.3f",
+        event.id,
+        u.input_tokens,
+        u.output_tokens,
+        u.cache_read_input_tokens or 0,
+        estimate_cost_usd(model, u.input_tokens, u.output_tokens),
+    )
     _record_usage(conn, event.id, model, response.usage, "sync")
     _record_output(conn, event.id, model, raw_text, result.model_dump())
     return result

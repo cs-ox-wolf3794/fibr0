@@ -169,7 +169,7 @@ Database (Supabase project `qfnjwhoizlxbigzdzbly`, URL `https://qfnjwhoizlxbigzd
 .venv/Scripts/fibr0 db status     # row counts
 ```
 
-`DATABASE_URL` must be the **Session pooler** connection string from the Supabase dashboard (host `aws-0-<region>.pooler.supabase.com`, port 5432, user `postgres.qfnjwhoizlxbigzdzbly`), not the direct `db.<ref>.supabase.co` host. The direct host is IPv6-only on the free tier and GitHub Actions runners have no IPv6. Set `DATABASE_URL` and `ANTHROPIC_API_KEY` as GitHub Actions secrets and the `NEXT_PUBLIC_SUPABASE_*` variables on Vercel. Locally both live in a git-ignored `.env` at the repo root, which the pipeline loads automatically.
+`DATABASE_URL` must be the **Session pooler** connection string: host `aws-1-eu-west-1.pooler.supabase.com`, port 5432, user `postgres.qfnjwhoizlxbigzdzbly`, database `postgres`. Not the direct `db.<ref>.supabase.co` host, which is IPv6-only on the free tier and unreachable from GitHub Actions runners and most corporate networks. If the pooler ever reports "tenant or user not found", the host or username is wrong, not the password. Set `DATABASE_URL` and `ANTHROPIC_API_KEY` as GitHub Actions secrets and the `NEXT_PUBLIC_SUPABASE_*` variables on Vercel. Locally both live in a git-ignored `.env` at the repo root, which the pipeline loads automatically.
 
 ## Things future sessions get wrong without being told
 
@@ -179,4 +179,6 @@ Database (Supabase project `qfnjwhoizlxbigzdzbly`, URL `https://qfnjwhoizlxbigzd
 - The compliance filter is strict word-boundary matching, so `long-term` and `short-lived` are blocked. The prompt tells the model this. If a legitimate summary is blocked, rephrase the prompt guidance, do not loosen the filter without owner sign-off.
 - Cron lines are duplicated for EDT and EST. The slot is decided in `market_calendar.slot_for`, not in the workflow. NYSE holidays are hard-coded there for 2026 and 2027.
 - The `ticker_universe.csv` seed is a starter list, not the full ETF constituent set. Predictions on tickers outside the universe are blocked at publish time because of the foreign key.
-- Source feed URLs in `sources.csv` were chosen by hand and have not all been verified live. EDGAR and page-kind sources have no fetcher yet; ingest skips them with a log line.
+- Every enabled feed in `sources.csv` was verified live on 2026-09-14. Rows with `enabled=false` are kept for the record: their name says why (Cloudflare bot challenge, discontinued, empty). Do not re-enable without re-verifying, and never work around a bot challenge; find a different source instead. Federal Register RSS is the substitute for agencies whose own sites block automation.
+- The fixture run on 2026-09-14 (5 events, 55 impacts) passed the compliance filter with zero hits and named 17 tickers outside the starter universe, which were then added. Expect this to recur; when the analyze log shows "not in ticker universe" blocks, add the ticker rather than loosening the check.
+- The ingest User-Agent includes a contact address because SEC EDGAR rejects generic agents.

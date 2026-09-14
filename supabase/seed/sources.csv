@@ -1,17 +1,26 @@
 id,name,tier,trust_weight,kind,url,enabled
 eia_today_in_energy,EIA Today in Energy,1,1.00,rss,https://www.eia.gov/rss/todayinenergy.xml,true
 eia_press,EIA Press Releases,1,1.00,rss,https://www.eia.gov/rss/press_rss.xml,true
-ferc_news,FERC News,1,1.00,rss,https://www.ferc.gov/news-events/news/rss.xml,true
-doe_news,DOE Newsroom,1,1.00,rss,https://www.energy.gov/rss/newsroom,true
+doe_newsroom,DOE Newsroom,1,1.00,rss,https://www.energy.gov/newsroom/rss.xml,true
+bsee_news,BSEE News and Reports,1,1.00,rss,https://www.bsee.gov/rss.xml,true
 nrc_news,NRC News Releases,1,1.00,rss,https://www.nrc.gov/public-involve/rss?feed=news,true
-bsee_news,BSEE Newsroom,1,1.00,rss,https://www.bsee.gov/newsroom/latest-news/rss.xml,true
-epa_news,EPA News Releases,1,0.95,rss,https://www.epa.gov/newsreleases/search/rss,true
 nhc_atlantic,NOAA NHC Atlantic Advisories,1,1.00,rss,https://www.nhc.noaa.gov/index-at.xml,true
-opec_press,OPEC Press Releases,1,0.95,rss,https://www.opec.org/opec_web/en/press_room/rss.xml,true
-iea_news,IEA News,1,0.95,rss,https://www.iea.org/news.rss,true
+fedreg_ferc,Federal Register: FERC documents,1,1.00,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=federal-energy-regulatory-commission,true
+fedreg_doe,Federal Register: DOE documents,1,1.00,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=energy-department,true
+fedreg_bsee_boem,Federal Register: BSEE and BOEM documents,1,1.00,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=safety-and-environmental-enforcement-bureau&conditions[agencies][]=ocean-energy-management-bureau,true
+fedreg_epa,Federal Register: EPA documents,1,0.95,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=environmental-protection-agency,true
+sec_edgar_8k,SEC EDGAR latest 8-K filings,1,1.00,rss,https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=100&output=atom,true
 globenewswire_energy,GlobeNewswire Energy,1,0.90,rss,https://www.globenewswire.com/RssFeed/industry/9576-Energy/feedTitle/GlobeNewswire%20-%20Industry%20News%20on%20Energy,true
-businesswire_energy,Business Wire Energy,1,0.90,rss,https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFpRWQ==,true
-sec_edgar_8k,SEC EDGAR 8-K (universe tickers),1,1.00,edgar,https://efts.sec.gov/LATEST/search-index?forms=8-K,true
-reuters_energy,Reuters Energy,2,0.80,rss,https://www.reutersagency.com/feed/?best-topics=energy&post_type=best,true
-ap_business,AP Business,2,0.80,rss,https://rsshub.app/apnews/topics/business,true
-gdelt_events,GDELT Event Stream,3,0.40,page,http://data.gdeltproject.org/gdeltv2/lastupdate.txt,false
+prnewswire_energy,PR Newswire Energy,1,0.90,rss,https://www.prnewswire.com/rss/energy-latest-news/energy-latest-news-list.rss,true
+prnewswire_oilgas,PR Newswire Oil and Gas,1,0.90,rss,https://www.prnewswire.com/rss/energy-latest-news/oil-energy-list.rss,true
+googlenews_energy,Google News: energy headlines (past day),2,0.70,rss,https://news.google.com/rss/search?q=(crude+OR+refinery+OR+OPEC+OR+%22natural+gas%22+OR+LNG+OR+pipeline)+when:1d&hl=en-US&gl=US&ceid=US:en,true
+oilprice_main,OilPrice.com,3,0.50,rss,https://oilprice.com/rss/main,true
+doe_news,DOE Newsroom (old URL returns 404; replaced by doe_newsroom),1,1.00,rss,https://www.energy.gov/rss/newsroom,false
+ferc_news,FERC News (site blocks automated access),1,1.00,rss,https://www.ferc.gov/news-events/news/rss.xml,false
+opec_press,OPEC Press Releases (site blocks automated access),1,0.95,rss,https://www.opec.org/opec_web/en/press_room/rss.xml,false
+epa_news,EPA News Releases (site blocks automated access),1,0.95,rss,https://www.epa.gov/newsreleases/search/rss,false
+iea_news,IEA News (no public feed found),1,0.95,rss,https://www.iea.org/news.rss,false
+reuters_energy,Reuters Energy (public feed discontinued),2,0.80,rss,https://www.reutersagency.com/feed/?best-topics=energy&post_type=best,false
+ap_business,AP Business via RSSHub (blocked),2,0.80,rss,https://rsshub.app/apnews/topics/business,false
+businesswire_energy,Business Wire Energy (feed returns no items),1,0.90,rss,https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFpRWQ==,false
+gdelt_events,GDELT Event Stream (no fetcher yet),3,0.40,page,http://data.gdeltproject.org/gdeltv2/lastupdate.txt,false
