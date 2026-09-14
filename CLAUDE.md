@@ -161,7 +161,15 @@ npm run lint
 npm run build
 ```
 
-Database: paste `supabase/migrations/0001_core.sql` into the Supabase SQL editor, then load the two seed CSVs as described in `supabase/seed/README.md`. Set `DATABASE_URL` and `ANTHROPIC_API_KEY` as GitHub Actions secrets and the `NEXT_PUBLIC_SUPABASE_*` variables on Vercel.
+Database (Supabase project `qfnjwhoizlxbigzdzbly`, URL `https://qfnjwhoizlxbigzdzbly.supabase.co`):
+
+```bash
+.venv/Scripts/fibr0 db migrate    # applies supabase/migrations/*.sql not yet in schema_migrations
+.venv/Scripts/fibr0 db seed       # upserts sources.csv and ticker_universe.csv, safe to re-run
+.venv/Scripts/fibr0 db status     # row counts
+```
+
+`DATABASE_URL` must be the **Session pooler** connection string from the Supabase dashboard (host `aws-0-<region>.pooler.supabase.com`, port 5432, user `postgres.qfnjwhoizlxbigzdzbly`), not the direct `db.<ref>.supabase.co` host. The direct host is IPv6-only on the free tier and GitHub Actions runners have no IPv6. Set `DATABASE_URL` and `ANTHROPIC_API_KEY` as GitHub Actions secrets and the `NEXT_PUBLIC_SUPABASE_*` variables on Vercel. Locally both live in a git-ignored `.env` at the repo root, which the pipeline loads automatically.
 
 ## Things future sessions get wrong without being told
 

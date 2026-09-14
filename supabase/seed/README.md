@@ -1,6 +1,18 @@
 # Seed data
 
-Load after applying `../migrations/0001_core.sql`. From the Supabase SQL editor the simplest path is Table Editor -> Import CSV on each table. With `psql`:
+Preferred path, from `pipeline/` with `DATABASE_URL` set in the repo-root `.env`:
+
+```bash
+.venv/Scripts/fibr0 db migrate
+```
+
+```bash
+.venv/Scripts/fibr0 db seed
+```
+
+Both are idempotent. Migrations are tracked in `schema_migrations`; seeds upsert on primary key.
+
+Manual fallback with `psql`:
 
 ```bash
 psql "$DATABASE_URL" -c "\copy sources from 'supabase/seed/sources.csv' csv header"

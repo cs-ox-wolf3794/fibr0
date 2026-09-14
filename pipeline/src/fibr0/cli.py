@@ -76,6 +76,21 @@ def cmd_resolve(args: argparse.Namespace, settings: Settings) -> int:
     return 0
 
 
+def cmd_db(args: argparse.Namespace, settings: Settings) -> int:
+    from fibr0 import admin
+
+    with connect(settings.require_database()) as conn:
+        if args.action == "migrate":
+            applied = admin.migrate(conn)
+            print("applied:", ", ".join(applied) if applied else "nothing pending")
+        elif args.action == "seed":
+            print("seeded:", admin.seed(conn))
+        elif args.action == "status":
+            for table, n in admin.status(conn).items():
+                print(f"{table:<18}{n:>8}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fibr0")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -88,6 +103,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     res_p = sub.add_parser("resolve", help="score elapsed predictions")
     res_p.set_defaults(func=cmd_resolve)
+
+    db_p = sub.add_parser("db", help="apply migrations, load seeds, show row counts")
+    db_p.add_argument("action", choices=("migrate", "seed", "status"))
+    db_p.set_defaults(func=cmd_db)
     return parser
 
 
