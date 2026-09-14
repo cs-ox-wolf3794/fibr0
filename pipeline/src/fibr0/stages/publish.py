@@ -39,6 +39,10 @@ def build_predictions(
         return kept, blocked
     for impact in result.impacts:
         ticker = impact.ticker.upper().strip()
+        if ticker == settings.benchmark_ticker:
+            # Confidence is defined net of the benchmark; a prediction on it is circular.
+            blocked.append(f"event {event.id} {ticker}: benchmark ticker is never a target")
+            continue
         if universe is not None and ticker not in universe:
             blocked.append(f"event {event.id} {ticker}: not in ticker universe")
             continue

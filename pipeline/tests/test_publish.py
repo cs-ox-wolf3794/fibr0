@@ -62,6 +62,14 @@ def test_unknown_ticker_is_blocked():
     assert "not in ticker universe" in blocked[0]
 
 
+def test_benchmark_ticker_is_never_a_target():
+    r = result("Peers gain margin. Effect is brief.")
+    r.impacts[0].ticker = "XLE"
+    kept, blocked = publish.build_predictions(event([1]), r, {}, SETTINGS, universe={"XLE"})
+    assert kept == []
+    assert "benchmark" in blocked[0]
+
+
 def test_tier3_only_event_is_capped():
     kept, _ = publish.build_predictions(
         event([3]), result("Peers gain margin. Effect is brief."), {}, SETTINGS
