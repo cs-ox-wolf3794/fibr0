@@ -46,8 +46,10 @@ class Settings:
     tier3_confidence_cap: float = 0.6
     # Minimum resolved predictions per (category, horizon) before a bucket counts as calibrated.
     min_resolved_for_calibration: int = 50
-    # Soft ceiling on events sent to the LLM per run. Protects the budget if a feed floods.
-    max_events_per_run: int = 25
+    # Hard ceiling on events sent to the LLM per run: three runs a day, so 24 events/day.
+    # Measured 2026-09-14: about USD 0.055 per event on the Batch API, so roughly USD 1.30/day
+    # and USD 40/month at this cap. Raise only with the owner's sign-off.
+    max_events_per_run: int = 8
 
     @classmethod
     def from_env(cls) -> Settings:

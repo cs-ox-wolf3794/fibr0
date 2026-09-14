@@ -16,12 +16,28 @@ _STOP = frozenset(
     "after amid over under into its it this that these those says said say".split()
 )
 _TOKEN = re.compile(r"[a-z0-9]+")
+# Aggregator headlines end in " - Publisher Name"; EDGAR titles carry "(CIK) (Filer)".
+_TITLE_NOISE = re.compile(r"\s+-\s+[^-]{2,60}$|\(\d{6,}\)|\(filer\)", re.IGNORECASE)
 
-JACCARD_THRESHOLD = 0.5
+JACCARD_THRESHOLD = 0.35
+MIN_SHARED_TOKENS = 3
+
+_SUFFIXES = ("ing", "ed", "es", "s")
+
+
+def _stem(token: str) -> str:
+    """Crude suffix stripping so shuts, shutdown and shutting land on one token."""
+    for suffix in _SUFFIXES:
+        if token.endswith(suffix) and len(token) - len(suffix) >= 4:
+            return token[: -len(suffix)]
+    return token
 
 
 def tokens(text: str) -> frozenset[str]:
-    return frozenset(t for t in _TOKEN.findall(text.lower()) if t not in _STOP and len(t) > 2)
+    text = _TITLE_NOISE.sub("", text)
+    return frozenset(
+        _stem(t) for t in _TOKEN.findall(text.lower()) if t not in _STOP and len(t) > 2
+    )
 
 
 def jaccard(a: frozenset[str], b: frozenset[str]) -> float:
@@ -32,15 +48,17 @@ def jaccard(a: frozenset[str], b: frozenset[str]) -> float:
 
 def cluster(items: list[RawItem], threshold: float = JACCARD_THRESHOLD) -> list[list[RawItem]]:
     """Greedy single-pass clustering on title token overlap. Good enough for a few dozen items."""
-    groups: list[tuple[frozenset[str], list[RawItem]]] = []
+    groups: list[tuple[set[str], list[RawItem]]] = []
     for item in items:
         toks = tokens(item.title)
         for group_tokens, members in groups:
-            if jaccard(toks, group_tokens) >= threshold:
+            shared = len(toks & group_tokens)
+            if shared >= MIN_SHARED_TOKENS and jaccard(toks, frozenset(group_tokens)) >= threshold:
                 members.append(item)
+                group_tokens |= toks  # the group's vocabulary grows with each member
                 break
         else:
-            groups.append((toks, [item]))
+            groups.append((set(toks), [item]))
     return [members for _, members in groups]
 
 

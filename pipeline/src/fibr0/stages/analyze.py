@@ -190,15 +190,26 @@ def analyze_batch(
     return results
 
 
+# Events older than this are never analyzed. A digest is about what just happened, and the
+# per-run cap must go to the newest, best-sourced events rather than draining a backlog.
+MAX_EVENT_AGE_HOURS = 18
+
+
 def load_unanalyzed(conn: psycopg.Connection, limit: int) -> list[Event]:
+    """Newest recent events first, preferring those with more sources and a Tier 1 source."""
     with conn.cursor() as cur:
         cur.execute(
             """
             select e.id, e.slot, e.title, e.text_for_analysis, e.source_urls, e.source_tiers
             from events e left join llm_outputs o on o.event_id = e.id
-            where o.id is null order by e.id limit %s
+            where o.id is null
+              and e.created_at > now() - make_interval(hours => %s)
+            order by (select min(t) from unnest(e.source_tiers) t) asc,
+                     cardinality(e.source_urls) desc,
+                     e.id desc
+            limit %s
             """,
-            (limit,),
+            (MAX_EVENT_AGE_HOURS, limit),
         )
         return [Event(**row) for row in cur.fetchall()]
 
