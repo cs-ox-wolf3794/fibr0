@@ -9,7 +9,7 @@ fedreg_ferc,Federal Register: FERC documents,1,1.00,rss,https://www.federalregis
 fedreg_doe,Federal Register: DOE documents,1,1.00,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=energy-department,true
 fedreg_bsee_boem,Federal Register: BSEE and BOEM documents,1,1.00,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=safety-and-environmental-enforcement-bureau&conditions[agencies][]=ocean-energy-management-bureau,true
 fedreg_epa,Federal Register: EPA documents,1,0.95,rss,https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=environmental-protection-agency,true
-sec_edgar_8k,SEC EDGAR latest 8-K filings,1,1.00,rss,https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=100&output=atom,true
+sec_edgar_8k,SEC EDGAR latest 8-K filings (index only; needs a filing fetcher before it is useful),1,1.00,rss,https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=100&output=atom,false
 globenewswire_energy,GlobeNewswire Energy,1,0.90,rss,https://www.globenewswire.com/RssFeed/industry/9576-Energy/feedTitle/GlobeNewswire%20-%20Industry%20News%20on%20Energy,true
 prnewswire_energy,PR Newswire Energy,1,0.90,rss,https://www.prnewswire.com/rss/energy-latest-news/energy-latest-news-list.rss,true
 prnewswire_oilgas,PR Newswire Oil and Gas,1,0.90,rss,https://www.prnewswire.com/rss/energy-latest-news/oil-energy-list.rss,true

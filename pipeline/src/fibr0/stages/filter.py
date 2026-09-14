@@ -24,7 +24,7 @@ MAX_AGE = timedelta(hours=36)
 
 # Sources whose feeds are dominated by procedural documents. For these, weak terms alone
 # never pass; the item must name a universe company or a market-moving event.
-STRICT_SOURCE_PREFIXES = ("fedreg_", "nrc_", "sec_edgar")
+STRICT_SOURCE_PREFIXES = ("fedreg_", "nrc_", "sec_edgar", "prnewswire_", "globenewswire_")
 
 # Sources where only a universe company match counts. EDGAR lists every filer in the
 # country, and words like "acquisition" appear in SPAC names.
@@ -48,6 +48,20 @@ EXCLUDE_PHRASES: tuple[str, ...] = (
     r"agreement state",
     r"test methods",
     r"technical conference",
+    # Learned from the first live run: routine disclosures and marketing that the model
+    # correctly refuses to predict on, so do not pay to ask.
+    r"buyback (update|program|progress)",
+    r"transactions under",
+    r"share repurchase",
+    r"\b(conference|summit|expo|exhibition|trade show|forum)\b",
+    r"\bopens in\b",
+    r"tropical weather outlook",
+    r"\bwebcast\b",
+    r"to (present|participate|host) at",
+    r"investor (day|conference|presentation)",
+    r"\baward",
+    r"\bappoint",
+    r"\bnames? .{0,30}\b(ceo|cfo|chief|director|president|officer)\b",
 )
 
 # Event types that move prices. Any single match passes the gate.
@@ -90,8 +104,7 @@ STRONG_PHRASES: tuple[str, ...] = (
     r"\bbankruptcy\b",
     r"\bchapter 11\b",
     r"\bdowngrade",
-    r"\bdividend\b",
-    r"\bbuyback\b",
+    r"\bdividend (cut|suspend|raise|increase)",
     r"\blayoffs?\b",
     r"\bstrike\b",
     r"\battack",

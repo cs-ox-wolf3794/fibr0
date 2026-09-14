@@ -196,7 +196,10 @@ MAX_EVENT_AGE_HOURS = 18
 
 
 def load_unanalyzed(conn: psycopg.Connection, limit: int) -> list[Event]:
-    """Newest recent events first, preferring those with more sources and a Tier 1 source."""
+    """Most-corroborated events first: source count, then source tier, then how much text
+    there is to work with, then recency. Corroboration beats tier because a single Tier 1
+    item is often a routine filing, while five outlets covering one story is always news.
+    """
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -204,8 +207,9 @@ def load_unanalyzed(conn: psycopg.Connection, limit: int) -> list[Event]:
             from events e left join llm_outputs o on o.event_id = e.id
             where o.id is null
               and e.created_at > now() - make_interval(hours => %s)
-            order by (select min(t) from unnest(e.source_tiers) t) asc,
-                     cardinality(e.source_urls) desc,
+            order by cardinality(e.source_urls) desc,
+                     (select min(t) from unnest(e.source_tiers) t) asc,
+                     length(e.text_for_analysis) desc,
                      e.id desc
             limit %s
             """,

@@ -98,6 +98,32 @@ def test_old_items_are_dropped():
     assert filter.classify(item("Exxon reports quarterly results", age_hours=48), m, NOW) is None
 
 
+def test_routine_disclosures_and_marketing_are_excluded():
+    m = matcher()
+    for title in (
+        "ASML reports transactions under its current share buyback program",
+        "ASM share buyback update September 7 - 11, 2026",
+        "Gastech 2026 Opens in Bangkok with a Clear Message",
+        "Atlantic Tropical Weather Outlook",
+        "Valero to present at Barclays energy conference",
+        "Exxon names new chief financial officer",
+    ):
+        assert filter.classify(item(title, source="globenewswire_energy"), m, NOW) is None, title
+
+
+def test_pr_wires_need_company_or_event_not_just_domain_terms():
+    m = matcher()
+    title = "Crude and natural gas outlook for the decade"
+    assert filter.classify(item(title, source="prnewswire_oilgas"), m, NOW) is None
+    assert filter.classify(item(title, source="googlenews_energy"), m, NOW) == "domain"
+    assert (
+        filter.classify(
+            item("Force majeure declared at Gulf terminal", source="prnewswire_oilgas"), m, NOW
+        )
+        == "event"
+    )
+
+
 def test_items_without_date_are_kept():
     m = matcher()
     i = item("Exxon reports quarterly results")
