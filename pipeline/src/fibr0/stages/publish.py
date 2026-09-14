@@ -1,4 +1,9 @@
-"""Stage 6: the only code path that writes to `predictions`. Compliance is enforced here."""
+"""Stage 6: the only code path that writes to `predictions`. Compliance is enforced here.
+
+Publish reads analyses from `llm_outputs`, not from the analyze stage's return value, so the
+two stages can run in separate processes and nothing analyzed is ever lost. Every event it
+handles gets `published_at` set, even when it yields no predictions.
+"""
 
 from __future__ import annotations
 
@@ -69,10 +74,42 @@ def build_predictions(
     return kept, blocked
 
 
-def store(conn: psycopg.Connection, predictions: list[Prediction], slot: Slot) -> int:
-    if not predictions:
-        return 0
+def load_unpublished(conn: psycopg.Connection) -> list[tuple[Event, AnalysisResult]]:
+    """Analyzed events that publish has not yet handled. Latest output per event wins."""
     with conn.cursor() as cur:
+        cur.execute(
+            """
+            select distinct on (e.id)
+                   e.id, e.slot, e.title, e.text_for_analysis, e.source_urls, e.source_tiers,
+                   o.parsed
+            from events e join llm_outputs o on o.event_id = e.id
+            where e.published_at is null
+            order by e.id, o.id desc
+            """
+        )
+        rows = cur.fetchall()
+    pairs: list[tuple[Event, AnalysisResult]] = []
+    for row in rows:
+        parsed = row.pop("parsed")
+        pairs.append((Event(**row), AnalysisResult.model_validate(parsed)))
+    return pairs
+
+
+def store(
+    conn: psycopg.Connection,
+    slot: Slot,
+    predictions: list[Prediction],
+    handled: list[tuple[Event, AnalysisResult]],
+) -> int:
+    with conn.cursor() as cur:
+        for event, result in handled:
+            cur.execute(
+                "update events set category = %s, event_summary = %s, published_at = now() "
+                "where id = %s",
+                (result.category, result.event_summary, event.id),
+            )
+        if not predictions:
+            return 0
         cur.execute("insert into digests (slot) values (%s) returning id", (slot.value,))
         digest_id = cur.fetchone()["id"]
         cur.executemany(
@@ -103,31 +140,22 @@ def store(conn: psycopg.Connection, predictions: list[Prediction], slot: Slot) -
         return cur.rowcount
 
 
-def run(
-    conn: psycopg.Connection,
-    slot: Slot,
-    results: dict[int, AnalysisResult],
-    settings: Settings,
-) -> int:
-    if not results:
+def run(conn: psycopg.Connection, slot: Slot, settings: Settings) -> int:
+    pending = load_unpublished(conn)
+    if not pending:
+        log.info("publish: nothing analyzed and unpublished")
         return 0
     calibration = score.load_calibration(conn)
     with conn.cursor() as cur:
         cur.execute("select ticker from ticker_universe where active")
         universe = {row["ticker"] for row in cur.fetchall()}
-        cur.execute(
-            "select id, slot, title, text_for_analysis, source_urls, source_tiers "
-            "from events where id = any(%s)",
-            (list(results),),
-        )
-        events = {row["id"]: Event(**row) for row in cur.fetchall()}
     all_kept: list[Prediction] = []
-    for event_id, result in results.items():
-        kept, blocked = build_predictions(events[event_id], result, calibration, settings, universe)
+    for event, result in pending:
+        kept, blocked = build_predictions(event, result, calibration, settings, universe)
         for reason in blocked:
             log.warning("blocked: %s", reason)
         all_kept.extend(kept)
+    log.info("publish: events=%d predictions=%d", len(pending), len(all_kept))
     if settings.dry_run:
-        log.info("dry run: would publish %d predictions", len(all_kept))
         return 0
-    return store(conn, all_kept, slot)
+    return store(conn, slot, all_kept, pending)

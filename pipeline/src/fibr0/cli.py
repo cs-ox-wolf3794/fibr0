@@ -34,22 +34,28 @@ def cmd_run(args: argparse.Namespace, settings: Settings) -> int:
     stages = STAGES if args.stage == "all" else (args.stage,)
     log.info("slot=%s stages=%s dry_run=%s", slot.value, ",".join(stages), settings.dry_run)
 
+    # Commit after every stage. The analyze stage can wait an hour on the Batch API, and an
+    # open transaction holding locks on events for that long blocks migrations and readers.
     with connect(settings.require_database()) as conn:
-        results = {}
         if "ingest" in stages:
             log.info("ingest new_rows=%d", ingest.run(conn, settings.dry_run))
+            conn.commit()
         if "filter" in stages:
             relevant, total = filter.run(conn, settings.dry_run)
             log.info("filter relevant=%d total=%d", relevant, total)
+            conn.commit()
         if "cluster" in stages:
             log.info("cluster events=%d", cluster.run(conn, slot, settings.dry_run))
+            conn.commit()
         if "analyze" in stages:
             results = analyze.run(
                 conn, settings.model, settings.max_events_per_run, settings.dry_run
             )
             log.info("analyze results=%d", len(results))
+            conn.commit()
         if "publish" in stages:
-            log.info("publish predictions=%d", publish.run(conn, slot, results, settings))
+            log.info("publish predictions=%d", publish.run(conn, slot, settings))
+            conn.commit()
     return 0
 
 
